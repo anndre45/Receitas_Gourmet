@@ -182,8 +182,76 @@ def get_recipes():
         for r in recipes
     ])
 
+@app.route('/recipes/<int:recipe_id>', methods=['PUT'])
+@jwt_required()
+def update_recipe(recipe_id):
+    """
+    Atualiza uma receita existente.
+    ---
+    security:
+        - BearerAuth: []
+    parameters:
+        - in: path
+            name: recipe_id
+            required: true
+            type: integer
+        - in: body
+            name: body
+            schema:
+                type: object
+                properties:
+                    title:
+                        type: string
+                    ingredients:
+                        type: string
+                    time_minutes:
+                        type: integer
+    responses:
+        200:
+            description: Receita atualizada
+        404:
+            description: Receita não encontrada
+        401:
+            description: Token não fornecido ou inválido
+    """
+    data = request.get_json()
+    recipe = Recipe.query.get_or_404(recipe_id)
+    if 'title' in data:
+        recipe.title = data['title']
+    if 'ingredients' in data:
+        recipe.ingredients = data['ingredients']
+    if 'time_minutes' in data:
+        recipe.time_minutes = data['time_minutes']
+    
+    db.session.commit()
+    return jsonify({"msg": "Recipe updated"}), 200
 
+@app.route('/recipes/<int:recipe_id>', methods=['DELETE'])
+@jwt_required()
+def delete_recipe(recipe_id):
+    """
+    Deleta uma receita existente.
+    ---
+    security:
+        - BearerAuth: []
+    parameters:
+        - in: path
+            name: recipe_id
+            required: true
+            type: integer
+    responses:
+        200:
+            description: Receita deletada
+        404:
+            description: Receita não encontrada
+        401:
+            description: Token não fornecido ou inválido
+    """
+    recipe = Recipe.query.get_or_404(recipe_id)
 
+    db.session.delete(recipe)
+    db.session.commit()
+    return jsonify({"msg": "Recipe deleted"}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
