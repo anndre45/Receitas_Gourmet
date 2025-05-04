@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flasgger import Swagger, swag_from
+import bcrypt
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -34,9 +35,13 @@ class Recipe(db.Model):
 @swag_from("swagger_docs/register_user.yml")
 def register_user():
     data = request.get_json()
+
     if User.query.filter_by(username=data["username"]).first():
         return jsonify({"error": "User already exists"}), 400
-    new_user = User(username=data["username"], password=data["password"])
+    password = b"data['password']"
+    salt = bcrypt.gensalt()
+    hashed_pw = bcrypt.hashpw(password=password, salt=salt)
+    new_user = User(username=data["username"], password=hashed_pw)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"msg": "User created"}), 201
@@ -46,8 +51,9 @@ def register_user():
 @swag_from("swagger_docs/login.yml")
 def login():
     data = request.get_json()
+    password = b"data['password']"
     user = User.query.filter_by(username=data["username"]).first()
-    if user and user.password == data["password"]:
+    if user and bcrypt.checkpw(password, user.password):
         # Converter o ID para string
         token = create_access_token(identity=str(user.id))
         return jsonify({"access_token": token}), 200
