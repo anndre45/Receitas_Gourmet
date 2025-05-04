@@ -1,0 +1,16 @@
+Deleta uma receita existente.
+---
+security:
+  - BearerAuth: []
+parameters:
+  - name: recipe_id
+    in: path
+    required: true
+    type: integer
+responses:
+  200:
+    description: Receita deletada.
+  404:
+    description: Receita não encontrada.
+  401:
+    description: Token não fornecido ou inválido.

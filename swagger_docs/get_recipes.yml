@@ -1,0 +1,31 @@
+Lista as receitas existentes.
+---
+security:
+  - BearerAuth: []
+parameters:
+  - name: ingredient
+    in: query
+    type: string
+    required: false
+    description: Filtra por ingrediente
+  - name: max_time
+    in: query
+    type: integer
+    required: false
+    description: Tempo máximo de preparo (minutos)
+responses:
+  200:
+    description: Lista de Receitas filtradas
+    content:
+      application/json:
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              title:
+                type: string
+              time_minutes:
+                type: integer

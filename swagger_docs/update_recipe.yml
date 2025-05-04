@@ -1,0 +1,28 @@
+Atualiza uma receita existente.
+---
+security:
+  - BearerAuth: []
+parameters:
+  - name: recipe_id
+    in: path
+    required: true
+    type: integer
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      properties:
+        title:
+          type: string
+        ingredients:
+          type: string
+        time_minutes:
+          type: integer
+responses:
+  200:
+    description: Receita atualizada.
+  404:
+    description: Receita não encontrada.
+  401:
+    description: Token não fornecido ou inválido.
