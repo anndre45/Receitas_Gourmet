@@ -38,9 +38,12 @@ def register_user():
 
     if User.query.filter_by(username=data["username"]).first():
         return jsonify({"error": "User already exists"}), 400
+    
+    # Hashing da senha 
     password = b"data['password']"
     salt = bcrypt.gensalt()
     hashed_pw = bcrypt.hashpw(password=password, salt=salt)
+
     new_user = User(username=data["username"], password=hashed_pw)
     db.session.add(new_user)
     db.session.commit()
